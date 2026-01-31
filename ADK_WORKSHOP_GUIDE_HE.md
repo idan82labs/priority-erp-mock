@@ -230,6 +230,24 @@ npm run dev
 
 > **שימו לב:** שרת ADK חייב לרוץ על פורט 8000 כדי שהממשק יעבוד!
 
+### לא עובד? יש ממשק מוכן!
+
+אם יש בעיות עם יצירת הממשק ב-Anti-Gravity, אפשר להשתמש בממשק המוכן:
+
+```bash
+# שכפלו את הריפו
+git clone https://github.com/idan82labs/priority-erp-mock.git
+
+# היכנסו לתיקיית הממשק
+cd priority-erp-mock/adk-frontend
+
+# התקינו והריצו
+npm install
+npm run dev
+```
+
+הממשק המוכן זהה לזה שבניתם - פשוט עובד מהקופסה!
+
 ---
 
 ## איך הממשק מתחבר לסוכן?
