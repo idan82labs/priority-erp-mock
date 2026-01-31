@@ -338,6 +338,68 @@ npm run dev
 
 ---
 
+## 🚩 תרגיל CTF: לכלך ולנקות!
+
+תרגיל זוגות כיפי - אחד מזין נתונים "מזויפים", השני צריך לנקות!
+
+### חוקי המשחק
+
+1. **התחלקו לזוגות** - שחקן A (המלכלך) ושחקן B (המנקה)
+2. **סבב 1:** שחקן A מזין 3 נתונים בעייתיים, שחקן B מנקה
+3. **סבב 2:** מחליפים תפקידים
+4. **הזוג שמנקה הכי מהר - מנצח!**
+
+### משימות לשחקן A (המלכלך) 🦹
+
+בקשו מהסוכן לבצע את הפעולות הבאות:
+
+**משימה 1 - לקוח מזויף:**
+> Create a new customer with name "חברת בדיקה 123", phone "000-0000000", email "fake@fake.fake"
+
+**משימה 2 - עדכון שגוי:**
+> Update customer C001 - set status to "Inactive" and change phone to "999-9999999"
+
+**משימה 3 - הזמנה תקועה:**
+> Update order ORD001 status to "Cancelled"
+
+### משימות לשחקן B (המנקה) 🧹
+
+עכשיו שחקן B צריך לגלות ולתקן! השתמשו בסוכן:
+
+**לגלות את הבעיות:**
+> Find all customers with phone starting with "000" or "999"
+
+> Show me all cancelled orders
+
+> Find customers with email containing "fake"
+
+**לתקן:**
+> Delete the customer with phone "000-0000000"
+
+> Update customer C001 - set status to "Active" and phone to "03-5551234"
+
+> Update order ORD001 status to "Open"
+
+### טבלת ניקוד
+
+| משימה | נקודות |
+|-------|--------|
+| מצא לקוח מזויף | 10 |
+| מחק לקוח מזויף | 15 |
+| תיקן סטטוס לקוח | 15 |
+| תיקן טלפון לקוח | 10 |
+| תיקן סטטוס הזמנה | 15 |
+| **בונוס:** סיימת תוך 5 דקות | 20 |
+
+### אתגר בונוס למתקדמים 🏆
+
+**המלכלך:** צרו 5 בעיות שונות בלי לספר מה עשיתם!
+
+**המנקה:** בקשו מהסוכן:
+> Analyze the system for suspicious data - look for fake emails, invalid phones, unusual statuses, or wrong data
+
+---
+
 ## תרגיל סיום
 
 בקשו מהסוכן:
