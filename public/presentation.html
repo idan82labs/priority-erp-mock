@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סדנת סוכני AI - אתגר CTF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f35;
+            --neon-blue: #00d4ff;
+            --neon-green: #00ff88;
+            --neon-purple: #a855f7;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-dim: #64748b;
+            --font-hebrew: 'Heebo', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-hebrew);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            direction: rtl;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Circuit board background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.02) 0%, transparent 50%);
+            background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            transition: width 0.4s ease;
+            z-index: 1000;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Slide counter */
+        .slide-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-code);
+            font-size: 14px;
+            color: var(--text-dim);
+            z-index: 1000;
+            direction: ltr;
+        }
+
+        /* Navigation hints */
+        .nav-hints {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: var(--text-dim);
+            z-index: 1000;
+            direction: ltr;
+        }
+
+        /* Slides container */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3.2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            color: var(--neon-blue);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.4em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            font-weight: 400;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .meta {
+            font-size: 1.1em;
+            color: var(--text-dim);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Content styles */
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            text-align: right;
+        }
+
+        .content-center {
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 8px 20px;
+            margin: 6px 0;
+            font-size: 1.2em;
+            font-weight: 300;
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        ul li::before {
+            content: '\25C6';
+            position: absolute;
+            right: 0;
+            color: var(--neon-green);
+            font-size: 0.7em;
+        }
+
+        /* Team cards */
+        .team-cards {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px 40px;
+            min-width: 280px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-card.red {
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        .team-card.blue {
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .team-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .team-card.red h3 {
+            color: #ef4444;
+        }
+
+        .team-card.blue h3 {
+            color: var(--neon-blue);
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 25px 30px;
+            font-family: var(--font-code);
+            font-size: 0.85em;
+            line-height: 1.7;
+            color: #e6edf3;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'Python';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.75em;
+            color: var(--text-dim);
+        }
+
+        .code-keyword { color: #ff7b72; }
+        .code-string { color: #a5d6ff; }
+        .code-decorator { color: #d2a8ff; }
+        .code-function { color: #d2a8ff; }
+        .code-comment { color: #8b949e; }
+        .code-param { color: #ffa657; }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* Scenario cards */
+        .scenario-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            border-color: var(--neon-purple);
+        }
+
+        .scenario-card .stars {
+            color: #fbbf24;
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        .scenario-card .name {
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        /* Tables */
+        .table-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 12px 16px;
+            text-align: right;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+            font-weight: 400;
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(0, 212, 255, 0.03);
+        }
+
+        /* Tags / Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 3px;
+            font-weight: 400;
+        }
+
+        .badge-blue {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--neon-blue);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .badge-green {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-purple {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--neon-purple);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Modules visual */
+        .modules-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 25px 0;
+            max-width: 900px;
+        }
+
+        .module-tag {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            color: var(--neon-green);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .module-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        /* Detection list */
+        .detection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .detection-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1em;
+        }
+
+        .detection-item .icon {
+            color: var(--neon-blue);
+            font-size: 1.2em;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        /* Exercise header */
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .exercise-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.9em;
+            color: var(--neon-purple);
+        }
+
+        /* Tip items */
+        .tips-list {
+            list-style: none;
+            max-width: 800px;
+        }
+
+        .tips-list li {
+            padding: 12px 25px;
+            margin: 10px 0;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border-right: 3px solid var(--neon-green);
+            font-size: 1.1em;
+        }
+
+        .tips-list li::before {
+            content: none;
+        }
+
+        /* Final slide glow */
+        .glow-text {
+            font-size: 4em;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-green), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        /* API reference code */
+        .api-ref {
+            font-family: var(--font-code);
+            font-size: 0.9em;
+            direction: ltr;
+            text-align: left;
+            color: var(--neon-green);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 15px 0;
+            max-width: 800px;
+        }
+
+        .highlight-box.warning {
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        /* Versus visual */
+        .versus-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .versus-text {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            h1 { font-size: 2.4em; }
+            h2 { font-size: 1.8em; }
+            .grid-5 { grid-template-columns: repeat(3, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .grid-5 { grid-template-columns: repeat(2, 1fr); }
+            .team-cards { flex-direction: column; align-items: center; }
+            .detection-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Scrollable content for dense slides */
+        .slide-scroll {
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .slide-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .slide-scroll::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter"></div>
+    <div class="nav-hints">[Space / Arrows]</div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active" data-slide="1">
+            <h1>סדנת סוכני AI - אתגר CTF</h1>
+            <div class="subtitle">בניית סוכנים חכמים עם Google ADK ו-Priority ERP</div>
+            <div class="meta">משך: 4 שעות | משתתפים: ~20</div>
+        </div>
+
+        <!-- Slide 2: What We'll Build -->
+        <div class="slide" data-slide="2">
+            <h2>מה נבנה היום?</h2>
+            <div class="team-cards">
+                <div class="team-card red">
+                    <h3>סוכן הכאוס</h3>
+                    <p style="color: var(--text-secondary); font-weight: 300;">Red Team</p>
+                    <p style="margin-top: 12px; font-size: 0.95em; color: var(--text-dim);">יוצר אנומליות חכמות במערכת ה-ERP</p>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span class="versus-text">VS</span>
+                </div>
+                <div class="team-card blue">
+                    <h3>סוכן הבלש</h3>
+                    <p style="color: var(--text-secondary); font-weight: 300;">Blue Team</p>
+                    <p style="margin-top: 12px; font-size: 0.95em; color: var(--text-dim);">מזהה ומדווח על חריגות בנתונים</p>
+                </div>
+            </div>
+            <div class="meta" style="margin-top: 30px;">כל ~20 המשתתפים חולקים מופע ERP אחד</div>
+        </div>
+
+        <!-- Slide 3: What is Priority ERP -->
+        <div class="slide" data-slide="3">
+            <h2>מה זה Priority ERP?</h2>
+            <p style="font-size: 1.2em; color: var(--text-secondary); margin-bottom: 25px; text-align: center;">מערכת ERP ישראלית מובילה - ממשק REST API בסגנון OData</p>
+            <div class="modules-wrap">
+                <div class="module-tag">לקוחות</div>
+                <div class="module-tag">הזמנות</div>
+                <div class="module-tag">מלאי</div>
+                <div class="module-tag">חשבוניות</div>
+                <div class="module-tag">פקודות עבודה</div>
+                <div class="module-tag">עצי מוצר</div>
+                <div class="module-tag">תוכניות ייצור</div>
+                <div class="module-tag">עובדים</div>
+            </div>
+            <div class="highlight-box" style="text-align: center;">
+                <span style="color: var(--neon-blue);">REST API</span> |
+                <span style="color: var(--neon-green);">OData-style queries</span> |
+                <span style="color: var(--neon-purple);">JSON responses</span>
+            </div>
+        </div>
+
+        <!-- Slide 4: Mock API Architecture -->
+        <div class="slide" data-slide="4">
+            <div class="slide-scroll">
+                <h2>ארכיטקטורת ה-API</h2>
+                <div class="grid-2" style="margin-bottom: 25px;">
+                    <div>
+                        <ul>
+                            <li><strong style="color: var(--neon-blue);">שרת:</strong> Node.js + Express</li>
+                            <li><strong style="color: var(--neon-blue);">נתונים:</strong> In-memory (מתאפס בהפעלה מחדש)</li>
+                            <li><strong style="color: var(--neon-blue);">אימות:</strong> X-API-Key header</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><strong style="color: var(--neon-green);">פורמט:</strong> JSON</li>
+                            <li><strong style="color: var(--neon-green);">שאילתות:</strong> OData-style</li>
+                            <li><strong style="color: var(--neon-green);">תיעוד:</strong> Swagger UI</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ישות</th>
+                                <th>Endpoint</th>
+                                <th>תיאור</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>לקוחות</td><td class="api-ref">/api/customers</td><td>ניהול לקוחות</td></tr>
+                            <tr><td>הזמנות</td><td class="api-ref">/api/orders</td><td>הזמנות מכירה</td></tr>
+                            <tr><td>פריטים</td><td class="api-ref">/api/items</td><td>קטלוג מוצרים</td></tr>
+                            <tr><td>מלאי</td><td class="api-ref">/api/inventory</td><td>יתרות מלאי</td></tr>
+                            <tr><td>חשבוניות</td><td class="api-ref">/api/invoices</td><td>חשבוניות מס</td></tr>
+                            <tr><td>עצי מוצר</td><td class="api-ref">/api/bom</td><td>מבנה מוצר</td></tr>
+                            <tr><td>עובדים</td><td class="api-ref">/api/employees</td><td>ניהול עובדים</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Google ADK -->
+        <div class="slide" data-slide="5">
+            <h2>Google ADK - ערכת פיתוח סוכנים</h2>
+            <div class="content content-center">
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-bottom: 30px;">Framework לבניית סוכני AI חכמים</p>
+                <div class="grid-2" style="max-width: 900px; margin: 0 auto;">
+                    <div>
+                        <h3 style="font-size: 1.2em;">מושגי מפתח</h3>
+                        <ul>
+                            <li><span class="badge badge-blue">Agent</span> - הסוכן הראשי</li>
+                            <li><span class="badge badge-green">Tool</span> - כלי עבודה</li>
+                            <li><span class="badge badge-purple">@Tool</span> - דקורטור פייתון</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.2em;">למה ADK?</h3>
+                        <ul>
+                            <li>לולאת סוכן מובנית</li>
+                            <li>כלים מובנים ומסודרים</li>
+                            <li>הסקה אוטומטית</li>
+                            <li>מודל: <span class="api-ref">gemini-2.0-flash</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: ADK Code Structure -->
+        <div class="slide" data-slide="6">
+            <h2>מבנה קוד ADK</h2>
+            <div class="code-block">
+<span class="code-keyword">from</span> google.adk <span class="code-keyword">import</span> Agent, Tool
+
+<span class="code-decorator">@Tool</span>
+<span class="code-keyword">def</span> <span class="code-function">query_erp</span>(<span class="code-param">entity</span>: <span class="code-param">str</span>, <span class="code-param">filters</span>: <span class="code-param">dict</span> = None) -> <span class="code-param">dict</span>:
+    <span class="code-string">"""Query Priority ERP API"""</span>
+    url = <span class="code-string">f"http://localhost:3000/api/{entity}"</span>
+    headers = {<span class="code-string">"X-API-Key"</span>: API_KEY}
+    response = requests.get(url, headers=headers, params=filters)
+    <span class="code-keyword">return</span> response.json()
+
+agent = Agent(
+    model=<span class="code-string">"gemini-2.0-flash"</span>,
+    name=<span class="code-string">"erp_agent"</span>,
+    instruction=<span class="code-string">"You are an ERP analysis agent..."</span>,
+    tools=[query_erp]
+)</div>
+        </div>
+
+        <!-- Slide 7: Exercise 1 -->
+        <div class="slide" data-slide="7">
+            <h2>תרגיל 1: סוכן חוקר (חימום)</h2>
+            <div class="exercise-header">
+                <span class="exercise-badge">30 דקות</span>
+                <span class="exercise-badge">10 נקודות</span>
+            </div>
+            <div class="content content-center">
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-bottom: 25px;">בנו סוכן שעונה על שאלות לגבי נתוני ה-ERP</p>
+                <div class="highlight-box">
+                    <p style="margin-bottom: 10px; color: var(--neon-green);">דוגמאות לשאילתות:</p>
+                    <ul style="font-size: 0.95em;">
+                        <li>"כמה לקוחות פעילים יש במערכת?"</li>
+                        <li>"מה ההזמנה הגדולה ביותר החודש?"</li>
+                        <li>"אילו פריטים במלאי נמוך?"</li>
+                        <li>"Who are the top 5 customers by revenue?"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Exercise 2 -->
+        <div class="slide" data-slide="8">
+            <h2>תרגיל 2: סוכן הכאוס (צוות אדום)</h2>
+            <div class="exercise-header">
+                <span class="exercise-badge">45 דקות</span>
+                <span class="exercise-badge" style="border-color: #ef4444; color: #ef4444;">Red Team</span>
+            </div>
+            <div class="content content-center">
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-bottom: 20px;">צרו אנומליות חכמות שקשה לזהות</p>
+                <div class="highlight-box warning">
+                    <p style="color: #fbbf24; font-size: 1.1em; text-align: center;">
+                        עיקרון מפתח: היו עדינים! הכי טוב = נראה כמעט נורמלי
+                    </p>
+                </div>
+                <p style="margin-top: 20px; color: var(--text-dim); font-size: 1em;">10 תרחישי אנומליה ברמות קושי שונות</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Chaos Scenarios -->
+        <div class="slide" data-slide="9">
+            <h2>תרחישי הכאוס</h2>
+            <div class="grid-5">
+                <div class="scenario-card">
+                    <div class="name">מניפולציית מחירים</div>
+                    <div class="stars">&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">לקוח פנטום</div>
+                    <div class="stars">&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">פרדוקס תאריכים</div>
+                    <div class="stars">&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">מלאי רפאים</div>
+                    <div class="stars">&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">כפילויות</div>
+                    <div class="stars">&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">בלבול סטטוסים</div>
+                    <div class="stars">&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">חריגת אשראי</div>
+                    <div class="stars">&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">פריטים יתומים</div>
+                    <div class="stars">&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">עובד רפאים</div>
+                    <div class="stars">&#11088;&#11088;&#11088;</div>
+                </div>
+                <div class="scenario-card">
+                    <div class="name">רקורסיית עץ מוצר</div>
+                    <div class="stars">&#11088;&#11088;&#11088;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Exercise 3 -->
+        <div class="slide" data-slide="10">
+            <h2>תרגיל 3: סוכן הבלש (צוות כחול)</h2>
+            <div class="exercise-header">
+                <span class="exercise-badge">60 דקות</span>
+                <span class="exercise-badge" style="border-color: var(--neon-blue); color: var(--neon-blue);">Blue Team</span>
+            </div>
+            <div class="content content-center">
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-bottom: 20px;">בנו סוכן שמזהה אנומליות ומדווח עליהן</p>
+                <div class="highlight-box">
+                    <p style="color: var(--neon-green); margin-bottom: 8px;">פורמט פלט: דוח JSON מובנה</p>
+                    <div class="code-block" style="font-size: 0.8em; margin: 10px 0; max-width: 600px;">
+{
+  "anomalies": [{
+    "type": "price_manipulation",
+    "entity": "ORDERS",
+    "record_id": "ORD-001",
+    "description": "...",
+    "confidence": 0.95
+  }]
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Detection Strategies -->
+        <div class="slide" data-slide="11">
+            <h2>אסטרטגיות זיהוי</h2>
+            <div class="detection-grid">
+                <div class="detection-item">
+                    <span class="icon">&#128269;</span>
+                    <span>אימות הצלבה (Cross-Reference)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128220;</span>
+                    <span>חוקים עסקיים (Business Rules)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#9200;</span>
+                    <span>בדיקות זמן (Temporal Logic)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128176;</span>
+                    <span>גבולות אשראי (Balance Checks)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128230;</span>
+                    <span>שפיות מלאי (Inventory Sanity)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128260;</span>
+                    <span>עקביות סטטוס (Status Consistency)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128194;</span>
+                    <span>זיהוי כפילויות (Duplicate Detection)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128279;</span>
+                    <span>רשומות יתומות (Orphan Records)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#127795;</span>
+                    <span>תקינות עץ מוצר (BOM Integrity)</span>
+                </div>
+                <div class="detection-item">
+                    <span class="icon">&#128100;</span>
+                    <span>עובדים ודיווחי שעות (Employee/Timesheet)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Exercise 4 - Agent Battle -->
+        <div class="slide" data-slide="12">
+            <h2>תרגיל 4: קרב סוכנים</h2>
+            <div class="content content-center">
+                <div class="versus-container" style="justify-content: center; margin-bottom: 25px;">
+                    <div class="team-card red" style="min-width: 200px; padding: 20px;">
+                        <h3 style="font-size: 1.2em;">כאוס</h3>
+                    </div>
+                    <span class="versus-text">VS</span>
+                    <div class="team-card blue" style="min-width: 200px; padding: 20px;">
+                        <h3 style="font-size: 1.2em;">בלש</h3>
+                    </div>
+                </div>
+                <div class="highlight-box" style="max-width: 600px; margin: 0 auto;">
+                    <ul style="font-size: 1em;">
+                        <li>5 אנומליות לפחות</li>
+                        <li>מינימום 3 סוגים שונים</li>
+                        <li>טיימר זיהוי: 5 דקות</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Scoring System -->
+        <div class="slide" data-slide="13">
+            <h2>מערכת ניקוד</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פעולה</th>
+                            <th>נקודות</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>אנומליה שלא זוהתה (כאוס)</td><td style="color: var(--neon-green);">+15</td></tr>
+                        <tr><td>אנומליה שזוהתה (בלש)</td><td style="color: var(--neon-green);">+10</td></tr>
+                        <tr><td>זיהוי שגוי - False Positive (בלש)</td><td style="color: #ef4444;">-5</td></tr>
+                        <tr><td>אנומליה גסה מדי (כאוס)</td><td style="color: #ef4444;">-5</td></tr>
+                        <tr><td>תיקון אוטומטי (בונוס)</td><td style="color: var(--neon-green);">+10</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <span class="badge badge-blue">הכאוס הטוב ביותר</span>
+                <span class="badge badge-green">הבלש הטוב ביותר</span>
+                <span class="badge badge-purple">הכי יצירתי</span>
+                <span class="badge badge-blue">מנצח כללי</span>
+            </div>
+        </div>
+
+        <!-- Slide 14: Exercise 5 - Self-Healing -->
+        <div class="slide" data-slide="14">
+            <h2>תרגיל 5: סוכן מתקן (בונוס)</h2>
+            <div class="exercise-header">
+                <span class="exercise-badge" style="border-color: var(--neon-green); color: var(--neon-green);">בונוס</span>
+                <span class="exercise-badge">10 נקודות לתיקון</span>
+            </div>
+            <div class="content content-center">
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-bottom: 25px;">זהו ותקנו אנומליות באופן אוטומטי</p>
+                <div class="grid-2" style="max-width: 800px; margin: 0 auto;">
+                    <div class="highlight-box">
+                        <h3 style="font-size: 1.1em; margin-bottom: 10px;">יכולות</h3>
+                        <ul style="font-size: 0.95em;">
+                            <li>זיהוי אוטומטי</li>
+                            <li>תיקון חכם</li>
+                            <li>דוח פעולות</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box warning">
+                        <h3 style="font-size: 1.1em; margin-bottom: 10px; color: #fbbf24;">בטיחות</h3>
+                        <ul style="font-size: 0.95em;">
+                            <li>תיעוד לפני תיקון</li>
+                            <li>מצב dry-run</li>
+                            <li>אפשרות שחזור</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: API Quick Reference -->
+        <div class="slide" data-slide="15">
+            <div class="slide-scroll">
+                <h2>עזרה מהירה - API</h2>
+                <div class="grid-2" style="max-width: 1000px;">
+                    <div>
+                        <h3 style="font-size: 1.1em;">אימות</h3>
+                        <div class="code-block" style="font-size: 0.75em; max-width: 450px;">
+<span class="code-param">Header:</span> X-API-Key: your-api-key
+<span class="code-param">GET</span>    /api/{entity}
+<span class="code-param">GET</span>    /api/{entity}/{id}
+<span class="code-param">POST</span>   /api/{entity}
+<span class="code-param">PUT</span>    /api/{entity}/{id}
+<span class="code-param">DELETE</span> /api/{entity}/{id}</div>
+                        <h3 style="font-size: 1.1em; margin-top: 15px;">פרמטרי שאילתה</h3>
+                        <div class="code-block" style="font-size: 0.75em; max-width: 450px;">
+<span class="code-param">$filter</span>=field eq 'value'
+<span class="code-param">$top</span>=10
+<span class="code-param">$skip</span>=20
+<span class="code-param">$orderby</span>=field desc
+<span class="code-param">$select</span>=field1,field2</div>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.1em;">ישויות ומפתחות</h3>
+                        <table style="font-size: 0.85em;">
+                            <thead>
+                                <tr><th>ישות</th><th>PK</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>customers</td><td>CUSTNAME</td></tr>
+                                <tr><td>orders</td><td>ORDNAME</td></tr>
+                                <tr><td>items</td><td>PARTNAME</td></tr>
+                                <tr><td>inventory</td><td>PARTNAME+WAREHOUSE</td></tr>
+                                <tr><td>invoices</td><td>IVNUM</td></tr>
+                                <tr><td>bom</td><td>PARTNAME+CHILD</td></tr>
+                                <tr><td>employees</td><td>EMPNO</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Tips for Success -->
+        <div class="slide" data-slide="16">
+            <h2>טיפים להצלחה</h2>
+            <ul class="tips-list">
+                <li>שמרו נתונים בזיכרון מקומי - Cache data locally</li>
+                <li>היו עדינים! אנומליות גסות קל לזהות (לצוות אדום)</li>
+                <li>בדקו קשרים בין ישויות (לצוות כחול)</li>
+                <li>השתמשו בפלט מובנה - Structured Output</li>
+                <li>נהלו את חלון ההקשר - Context Window</li>
+                <li>קראו את התיעוד של ה-API לפני שמתחילים</li>
+            </ul>
+        </div>
+
+        <!-- Slide 17: Let's Begin -->
+        <div class="slide" data-slide="17">
+            <div class="glow-text">!בהצלחה</div>
+            <div style="margin-top: 40px; text-align: center;">
+                <p style="font-size: 1.2em; color: var(--text-secondary); margin-bottom: 20px;">שהסוכן הטוב ביותר ינצח!</p>
+                <div class="highlight-box" style="display: inline-block; text-align: left; direction: ltr;">
+                    <p style="margin-bottom: 8px;"><span style="color: var(--neon-blue);">API:</span> <span class="api-ref">http://localhost:3000</span></p>
+                    <p style="margin-bottom: 8px;"><span style="color: var(--neon-blue);">Docs:</span> <span class="api-ref">http://localhost:3000/api-docs</span></p>
+                    <p><span style="color: var(--neon-blue);">Key:</span> <span class="api-ref">your-api-key-here</span></p>
+                </div>
+            </div>
+            <p class="meta" style="margin-top: 30px; font-style: italic;">May the best agent win!</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            const progressBar = document.getElementById('progressBar');
+            const slideCounter = document.getElementById('slideCounter');
+
+            function updateUI() {
+                const progress = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = progress + '%';
+                slideCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+            }
+
+            function goToSlide(index) {
+                if (index < 0 || index >= totalSlides || index === currentSlide) return;
+
+                const prevSlide = slides[currentSlide];
+                const nextSlide = slides[index];
+
+                // Determine direction
+                const goingForward = index > currentSlide;
+
+                // Remove all state classes
+                slides.forEach(s => {
+                    s.classList.remove('active', 'prev');
+                });
+
+                // Set transition direction
+                if (goingForward) {
+                    prevSlide.classList.add('prev');
+                }
+
+                // Activate new slide
+                nextSlide.classList.add('active');
+
+                currentSlide = index;
+                updateUI();
+            }
+
+            function nextSlide() {
+                goToSlide(currentSlide + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(currentSlide - 1);
+            }
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                    case 'ArrowDown':
+                    case ' ':
+                    case 'PageDown':
+                        e.preventDefault();
+                        nextSlide();
+                        break;
+                    case 'ArrowRight':
+                    case 'ArrowUp':
+                    case 'PageUp':
+                        e.preventDefault();
+                        prevSlide();
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        goToSlide(0);
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        goToSlide(totalSlides - 1);
+                        break;
+                }
+            });
+
+            // Touch support
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        // Swiped left (RTL: next)
+                        nextSlide();
+                    } else {
+                        // Swiped right (RTL: prev)
+                        prevSlide();
+                    }
+                }
+            });
+
+            // Initialize
+            updateUI();
+        })();
+    </script>
+</body>
+</html>

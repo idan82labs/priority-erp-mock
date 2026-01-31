@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priorit-AI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x26A1;</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">Priorit-AI</span>
+      <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar">&#9776;</button>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" data-module="dashboard">
+        <span class="nav-icon">&#x1F4CA;</span>
+        <span class="nav-label" data-i18n="nav.dashboard">Dashboard</span>
+      </div>
+      <div class="nav-section-title" data-i18n="nav.core">Core</div>
+      <div class="nav-item" data-module="customers">
+        <span class="nav-icon">&#x1F465;</span>
+        <span class="nav-label" data-i18n="nav.customers">Customers</span>
+      </div>
+      <div class="nav-item" data-module="orders">
+        <span class="nav-icon">&#x1F4CB;</span>
+        <span class="nav-label" data-i18n="nav.orders">Orders</span>
+      </div>
+      <div class="nav-item" data-module="products">
+        <span class="nav-icon">&#x1F4E6;</span>
+        <span class="nav-label" data-i18n="nav.products">Products</span>
+      </div>
+      <div class="nav-item" data-module="invoices">
+        <span class="nav-icon">&#x1F9FE;</span>
+        <span class="nav-label" data-i18n="nav.invoices">Invoices</span>
+      </div>
+      <div class="nav-item" data-module="suppliers">
+        <span class="nav-icon">&#x1F3ED;</span>
+        <span class="nav-label" data-i18n="nav.suppliers">Suppliers</span>
+      </div>
+      <div class="nav-section-title" data-i18n="nav.manufacturing">Manufacturing</div>
+      <div class="nav-item" data-module="workorders">
+        <span class="nav-icon">&#x1F527;</span>
+        <span class="nav-label" data-i18n="nav.workorders">Work Orders</span>
+      </div>
+      <div class="nav-item" data-module="bom">
+        <span class="nav-icon">&#x1F333;</span>
+        <span class="nav-label" data-i18n="nav.bom">Bill of Materials</span>
+      </div>
+      <div class="nav-item" data-module="production">
+        <span class="nav-icon">&#x2699;&#xFE0F;</span>
+        <span class="nav-label" data-i18n="nav.production">Production Plans</span>
+      </div>
+      <div class="nav-section-title" data-i18n="nav.hr">HR</div>
+      <div class="nav-item" data-module="employees">
+        <span class="nav-icon">&#x1F464;</span>
+        <span class="nav-label" data-i18n="nav.employees">Employees</span>
+      </div>
+      <div class="nav-item" data-module="timesheets">
+        <span class="nav-icon">&#x23F1;&#xFE0F;</span>
+        <span class="nav-label" data-i18n="nav.timesheets">Timesheets</span>
+      </div>
+      <div class="nav-item" data-module="departments">
+        <span class="nav-icon">&#x1F3E2;</span>
+        <span class="nav-label" data-i18n="nav.departments">Departments</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Top Toolbar -->
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-logo">Priorit-AI</span>
+      </div>
+      <div class="toolbar-right">
+        <div class="lang-toggle">
+          <button id="lang-en" class="lang-btn active">EN</button>
+          <button id="lang-he" class="lang-btn">&#x05E2;&#x05D1;</button>
+        </div>
+        <div class="user-info">
+          <div class="user-avatar">WU</div>
+          <span class="user-name">Workshop User</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <div class="page-header">
+        <h1 class="page-title" id="page-title" data-i18n="nav.dashboard">Dashboard</h1>
+        <div class="page-actions" id="content-actions"></div>
+      </div>
+      <div class="relative">
+        <div id="content-area-inner">
+          <!-- Dynamically loaded content -->
+        </div>
+        <!-- Loading Spinner -->
+        <div class="spinner-overlay" id="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Create/Edit -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Create</h2>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Dynamic form fields -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

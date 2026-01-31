@@ -1,0 +1,2104 @@
+openapi: '3.0.0'
+info:
+  title: Priority ERP Mock API
+  version: '1.0.0'
+  description: Mock Priority ERP OData-style API for workshop on building AI agents with Google Gemini SDK
+
+servers:
+  - url: http://localhost:3000
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        timestamp:
+          type: string
+        entities:
+          type: array
+          items:
+            type: string
+
+    Customer:
+      type: object
+      properties:
+        CUSTNAME:
+          type: string
+        CUSTDES:
+          type: string
+        PHONE:
+          type: string
+        EMAIL:
+          type: string
+        ADDRESS:
+          type: string
+        CITY:
+          type: string
+        STATE:
+          type: string
+        COUNTRY:
+          type: string
+        BALANCE:
+          type: number
+        CREDIT_LIMIT:
+          type: number
+        STATUS:
+          type: string
+          enum: [A, I]
+
+    CustomerList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+
+    Order:
+      type: object
+      properties:
+        ORDNAME:
+          type: string
+        CUSTNAME:
+          type: string
+        CURDATE:
+          type: string
+          format: date
+        ORDSTATUS:
+          type: string
+          enum: [O, C, P]
+        QPRICE:
+          type: number
+        DETAILS:
+          type: string
+        ORDERITEMS_SUBFORM:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+
+    OrderList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+
+    OrderItem:
+      type: object
+      properties:
+        LINE:
+          type: integer
+          description: Auto-generated line number
+        PARTNAME:
+          type: string
+        TQUANT:
+          type: number
+        PRICE:
+          type: number
+        DUEDATE:
+          type: string
+          format: date
+        KLINE:
+          type: string
+
+    OrderItemList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+
+    Product:
+      type: object
+      properties:
+        PARTNAME:
+          type: string
+        PARTDES:
+          type: string
+        BARCODE:
+          type: string
+        UNIT:
+          type: string
+        SELLPRICE:
+          type: number
+        COSTPRICE:
+          type: number
+        INVENTORY:
+          type: integer
+        FAMILY:
+          type: string
+        STATUS:
+          type: string
+
+    ProductList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+
+    Invoice:
+      type: object
+      properties:
+        IVNUM:
+          type: string
+        CUSTNAME:
+          type: string
+        IVDATE:
+          type: string
+          format: date
+        TOTAL:
+          type: number
+        IVSTATUS:
+          type: string
+          enum: [O, P]
+        PAYDATE:
+          type: string
+          format: date
+        AINVOICEITEMS_SUBFORM:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceItem'
+
+    InvoiceList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+
+    InvoiceItem:
+      type: object
+      properties:
+        LINE:
+          type: integer
+        PARTNAME:
+          type: string
+        TQUANT:
+          type: number
+        PRICE:
+          type: number
+
+    InvoiceItemList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceItem'
+
+    Supplier:
+      type: object
+      properties:
+        SUPNAME:
+          type: string
+        SUPDES:
+          type: string
+        PHONE:
+          type: string
+        EMAIL:
+          type: string
+        ADDRESS:
+          type: string
+        COUNTRY:
+          type: string
+        STATUS:
+          type: string
+
+    SupplierList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Supplier'
+
+    WorkOrder:
+      type: object
+      properties:
+        WONUM:
+          type: string
+        PARTNAME:
+          type: string
+        TQUANT:
+          type: number
+        STARTDATE:
+          type: string
+          format: date
+        ENDDATE:
+          type: string
+          format: date
+        WOSTATUS:
+          type: string
+          enum: [P, A, C]
+        PRIORITY:
+          type: integer
+
+    WorkOrderList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkOrder'
+
+    BOM:
+      type: object
+      properties:
+        BOMNAME:
+          type: string
+        PARTNAME:
+          type: string
+        BOMDES:
+          type: string
+        REVISION:
+          type: string
+        STATUS:
+          type: string
+        BOMITEMS_SUBFORM:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMItem'
+
+    BOMList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOM'
+
+    BOMItem:
+      type: object
+      properties:
+        LINE:
+          type: integer
+        CHILDPART:
+          type: string
+        TQUANT:
+          type: number
+        UNIT:
+          type: string
+
+    BOMItemList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMItem'
+
+    ProductionPlan:
+      type: object
+      properties:
+        PLANNAME:
+          type: string
+        PLANDES:
+          type: string
+        STARTDATE:
+          type: string
+          format: date
+        ENDDATE:
+          type: string
+          format: date
+        STATUS:
+          type: string
+
+    ProductionPlanList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductionPlan'
+
+    Employee:
+      type: object
+      properties:
+        EMPNUM:
+          type: string
+        EMPNAME:
+          type: string
+        DEPT:
+          type: string
+        POSITION:
+          type: string
+        HIREDATE:
+          type: string
+          format: date
+        PHONE:
+          type: string
+        EMAIL:
+          type: string
+        STATUS:
+          type: string
+
+    EmployeeList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+
+    Timesheet:
+      type: object
+      properties:
+        TSNUM:
+          type: string
+        EMPNUM:
+          type: string
+        TSDATE:
+          type: string
+          format: date
+        HOURS:
+          type: number
+        PROJECT:
+          type: string
+        DESCRIPTION:
+          type: string
+
+    TimesheetList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Timesheet'
+
+    Department:
+      type: object
+      properties:
+        DEPTCODE:
+          type: string
+        DEPTDES:
+          type: string
+        MANAGER:
+          type: string
+        HEADCOUNT:
+          type: integer
+
+    DepartmentList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Department'
+
+  parameters:
+    filterParam:
+      name: $filter
+      in: query
+      description: OData filter expression
+      schema:
+        type: string
+    orderbyParam:
+      name: $orderby
+      in: query
+      description: OData orderby expression
+      schema:
+        type: string
+    topParam:
+      name: $top
+      in: query
+      description: Number of records to return
+      schema:
+        type: integer
+    skipParam:
+      name: $skip
+      in: query
+      description: Number of records to skip
+      schema:
+        type: integer
+    selectParam:
+      name: $select
+      in: query
+      description: Comma-separated list of fields to return
+      schema:
+        type: string
+    expandParam:
+      name: $expand
+      in: query
+      description: Subform to expand inline
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized - missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict - resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Customers
+    description: Customer management
+  - name: Orders
+    description: Sales order management
+  - name: Products
+    description: Product catalog
+  - name: Invoices
+    description: Invoice management
+  - name: Suppliers
+    description: Supplier management
+  - name: Manufacturing
+    description: Manufacturing operations
+  - name: HR
+    description: Human resources
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: API health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/$metadata:
+    get:
+      summary: Get entity metadata
+      operationId: getMetadata
+      security: []
+      responses:
+        '200':
+          description: Entity metadata
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ==================== CUSTOMERS ====================
+  /api/CUSTOMERS:
+    get:
+      summary: List customers
+      operationId: listCustomers
+      tags: [Customers]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a customer
+      operationId: createCustomer
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/CUSTOMERS('{CUSTNAME}')":
+    get:
+      summary: Get a customer by key
+      operationId: getCustomer
+      tags: [Customers]
+      parameters:
+        - name: CUSTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a customer
+      operationId: updateCustomer
+      tags: [Customers]
+      parameters:
+        - name: CUSTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a customer
+      operationId: deleteCustomer
+      tags: [Customers]
+      parameters:
+        - name: CUSTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Customer deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== ORDERS ====================
+  /api/ORDERS:
+    get:
+      summary: List orders
+      operationId: listOrders
+      tags: [Orders]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+        - $ref: '#/components/parameters/expandParam'
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create an order
+      operationId: createOrder
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/ORDERS('{ORDNAME}')":
+    get:
+      summary: Get an order by key
+      operationId: getOrder
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update an order
+      operationId: updateOrder
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an order
+      operationId: deleteOrder
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Order deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/ORDERS('{ORDNAME}')/ORDERITEMS_SUBFORM":
+    get:
+      summary: List order items
+      operationId: listOrderItems
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of order items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItemList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Add an order item
+      operationId: createOrderItem
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItem'
+      responses:
+        '201':
+          description: Order item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/ORDERS('{ORDNAME}')/ORDERITEMS_SUBFORM({LINE})":
+    patch:
+      summary: Update an order item
+      operationId: updateOrderItem
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItem'
+      responses:
+        '200':
+          description: Order item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an order item
+      operationId: deleteOrderItem
+      tags: [Orders]
+      parameters:
+        - name: ORDNAME
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Order item deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== PRODUCTS ====================
+  /api/LOGPART:
+    get:
+      summary: List products
+      operationId: listProducts
+      tags: [Products]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a product
+      operationId: createProduct
+      tags: [Products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/LOGPART('{PARTNAME}')":
+    get:
+      summary: Get a product by key
+      operationId: getProduct
+      tags: [Products]
+      parameters:
+        - name: PARTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a product
+      operationId: updateProduct
+      tags: [Products]
+      parameters:
+        - name: PARTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a product
+      operationId: deleteProduct
+      tags: [Products]
+      parameters:
+        - name: PARTNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== INVOICES ====================
+  /api/AINVOICES:
+    get:
+      summary: List invoices
+      operationId: listInvoices
+      tags: [Invoices]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+        - $ref: '#/components/parameters/expandParam'
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create an invoice
+      operationId: createInvoice
+      tags: [Invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invoice'
+      responses:
+        '201':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/AINVOICES('{IVNUM}')":
+    get:
+      summary: Get an invoice by key
+      operationId: getInvoice
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update an invoice
+      operationId: updateInvoice
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invoice'
+      responses:
+        '200':
+          description: Invoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an invoice
+      operationId: deleteInvoice
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Invoice deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/AINVOICES('{IVNUM}')/AINVOICEITEMS_SUBFORM":
+    get:
+      summary: List invoice items
+      operationId: listInvoiceItems
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of invoice items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceItemList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Add an invoice item
+      operationId: createInvoiceItem
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceItem'
+      responses:
+        '201':
+          description: Invoice item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/AINVOICES('{IVNUM}')/AINVOICEITEMS_SUBFORM({LINE})":
+    patch:
+      summary: Update an invoice item
+      operationId: updateInvoiceItem
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceItem'
+      responses:
+        '200':
+          description: Invoice item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an invoice item
+      operationId: deleteInvoiceItem
+      tags: [Invoices]
+      parameters:
+        - name: IVNUM
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Invoice item deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== SUPPLIERS ====================
+  /api/SUPPLIERS:
+    get:
+      summary: List suppliers
+      operationId: listSuppliers
+      tags: [Suppliers]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a supplier
+      operationId: createSupplier
+      tags: [Suppliers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        '201':
+          description: Supplier created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/SUPPLIERS('{SUPNAME}')":
+    get:
+      summary: Get a supplier by key
+      operationId: getSupplier
+      tags: [Suppliers]
+      parameters:
+        - name: SUPNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Supplier details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a supplier
+      operationId: updateSupplier
+      tags: [Suppliers]
+      parameters:
+        - name: SUPNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        '200':
+          description: Supplier updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a supplier
+      operationId: deleteSupplier
+      tags: [Suppliers]
+      parameters:
+        - name: SUPNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Supplier deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== WORK ORDERS ====================
+  /api/WORKORDERS:
+    get:
+      summary: List work orders
+      operationId: listWorkOrders
+      tags: [Manufacturing]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of work orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrderList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a work order
+      operationId: createWorkOrder
+      tags: [Manufacturing]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkOrder'
+      responses:
+        '201':
+          description: Work order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/WORKORDERS('{WONUM}')":
+    get:
+      summary: Get a work order by key
+      operationId: getWorkOrder
+      tags: [Manufacturing]
+      parameters:
+        - name: WONUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Work order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a work order
+      operationId: updateWorkOrder
+      tags: [Manufacturing]
+      parameters:
+        - name: WONUM
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkOrder'
+      responses:
+        '200':
+          description: Work order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a work order
+      operationId: deleteWorkOrder
+      tags: [Manufacturing]
+      parameters:
+        - name: WONUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Work order deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== BOM ====================
+  /api/BOM:
+    get:
+      summary: List bills of materials
+      operationId: listBOMs
+      tags: [Manufacturing]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+        - $ref: '#/components/parameters/expandParam'
+      responses:
+        '200':
+          description: List of BOMs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a bill of materials
+      operationId: createBOM
+      tags: [Manufacturing]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOM'
+      responses:
+        '201':
+          description: BOM created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOM'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/BOM('{BOMNAME}')":
+    get:
+      summary: Get a BOM by key
+      operationId: getBOM
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: BOM details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a BOM
+      operationId: updateBOM
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOM'
+      responses:
+        '200':
+          description: BOM updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOM'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a BOM
+      operationId: deleteBOM
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: BOM deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/BOM('{BOMNAME}')/BOMITEMS_SUBFORM":
+    get:
+      summary: List BOM items
+      operationId: listBOMItems
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of BOM items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMItemList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Add a BOM item
+      operationId: createBOMItem
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMItem'
+      responses:
+        '201':
+          description: BOM item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  "/api/BOM('{BOMNAME}')/BOMITEMS_SUBFORM({LINE})":
+    patch:
+      summary: Update a BOM item
+      operationId: updateBOMItem
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMItem'
+      responses:
+        '200':
+          description: BOM item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a BOM item
+      operationId: deleteBOMItem
+      tags: [Manufacturing]
+      parameters:
+        - name: BOMNAME
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: LINE
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: BOM item deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== PRODUCTION PLANS ====================
+  /api/PRODUCTIONPLANS:
+    get:
+      summary: List production plans
+      operationId: listProductionPlans
+      tags: [Manufacturing]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of production plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionPlanList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a production plan
+      operationId: createProductionPlan
+      tags: [Manufacturing]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductionPlan'
+      responses:
+        '201':
+          description: Production plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionPlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/PRODUCTIONPLANS('{PLANNAME}')":
+    get:
+      summary: Get a production plan by key
+      operationId: getProductionPlan
+      tags: [Manufacturing]
+      parameters:
+        - name: PLANNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Production plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionPlan'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a production plan
+      operationId: updateProductionPlan
+      tags: [Manufacturing]
+      parameters:
+        - name: PLANNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductionPlan'
+      responses:
+        '200':
+          description: Production plan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionPlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a production plan
+      operationId: deleteProductionPlan
+      tags: [Manufacturing]
+      parameters:
+        - name: PLANNAME
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Production plan deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== EMPLOYEES ====================
+  /api/EMPLOYEES:
+    get:
+      summary: List employees
+      operationId: listEmployees
+      tags: [HR]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create an employee
+      operationId: createEmployee
+      tags: [HR]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/EMPLOYEES('{EMPNUM}')":
+    get:
+      summary: Get an employee by key
+      operationId: getEmployee
+      tags: [HR]
+      parameters:
+        - name: EMPNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update an employee
+      operationId: updateEmployee
+      tags: [HR]
+      parameters:
+        - name: EMPNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: Employee updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an employee
+      operationId: deleteEmployee
+      tags: [HR]
+      parameters:
+        - name: EMPNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Employee deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== TIMESHEETS ====================
+  /api/TIMESHEETS:
+    get:
+      summary: List timesheets
+      operationId: listTimesheets
+      tags: [HR]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of timesheets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a timesheet entry
+      operationId: createTimesheet
+      tags: [HR]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timesheet'
+      responses:
+        '201':
+          description: Timesheet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/TIMESHEETS('{TSNUM}')":
+    get:
+      summary: Get a timesheet by key
+      operationId: getTimesheet
+      tags: [HR]
+      parameters:
+        - name: TSNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Timesheet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a timesheet
+      operationId: updateTimesheet
+      tags: [HR]
+      parameters:
+        - name: TSNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timesheet'
+      responses:
+        '200':
+          description: Timesheet updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a timesheet
+      operationId: deleteTimesheet
+      tags: [HR]
+      parameters:
+        - name: TSNUM
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Timesheet deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== DEPARTMENTS ====================
+  /api/DEPARTMENTS:
+    get:
+      summary: List departments
+      operationId: listDepartments
+      tags: [HR]
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/orderbyParam'
+        - $ref: '#/components/parameters/topParam'
+        - $ref: '#/components/parameters/skipParam'
+        - $ref: '#/components/parameters/selectParam'
+      responses:
+        '200':
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a department
+      operationId: createDepartment
+      tags: [HR]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Department created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  "/api/DEPARTMENTS('{DEPTCODE}')":
+    get:
+      summary: Get a department by key
+      operationId: getDepartment
+      tags: [HR]
+      parameters:
+        - name: DEPTCODE
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Department details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a department
+      operationId: updateDepartment
+      tags: [HR]
+      parameters:
+        - name: DEPTCODE
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Department updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a department
+      operationId: deleteDepartment
+      tags: [HR]
+      parameters:
+        - name: DEPTCODE
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Department deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
