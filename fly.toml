@@ -1,4 +1,4 @@
-app = "app-nameless-dust-4209"
+app = "priority-erp-mock"
 primary_region = "fra"
 
 [build]

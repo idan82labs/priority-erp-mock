@@ -1,6 +1,6 @@
 function authMiddleware(req, res, next) {
   const apiKey = req.headers['x-api-key'];
-  const expectedKey = process.env.API_KEY || 'test-key';
+  const expectedKey = process.env.API_KEY || 'priority-adk-workshop-2026';
 
   if (!apiKey) {
     return res.status(401).json({

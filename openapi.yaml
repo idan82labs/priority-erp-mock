@@ -2,10 +2,22 @@ openapi: '3.0.0'
 info:
   title: Priority ERP Mock API
   version: '1.0.0'
-  description: Mock Priority ERP OData-style API for workshop on building AI agents with Google Gemini SDK
+  description: |
+    Mock Priority ERP OData-style API for workshop on building AI agents with Google ADK.
+
+    ## Authentication
+    All API requests require an API key passed in the `X-API-Key` header.
+
+    Workshop API Key: `priority-adk-workshop-2026`
+
+    ## Example Request
+    ```
+    curl -H "X-API-Key: priority-adk-workshop-2026" https://priority-erp-mock.fly.dev/api/CUSTOMERS
+    ```
 
 servers:
-  - url: http://localhost:3000
+  - url: https://priority-erp-mock.fly.dev
+    description: Production server (Fly.io)
 
 security:
   - ApiKeyAuth: []
@@ -63,7 +75,8 @@ components:
           type: number
         STATUS:
           type: string
-          enum: [A, I]
+          enum: [Active, Inactive]
+          description: Customer status
 
     CustomerList:
       type: object
@@ -85,7 +98,8 @@ components:
           format: date
         ORDSTATUS:
           type: string
-          enum: [O, C, P]
+          enum: [Open, In Progress, Shipped, Delivered, Cancelled]
+          description: Order status
         QPRICE:
           type: number
         DETAILS:
@@ -173,7 +187,8 @@ components:
           type: number
         IVSTATUS:
           type: string
-          enum: [O, P]
+          enum: [Draft, Sent, Paid, Overdue]
+          description: Invoice status
         PAYDATE:
           type: string
           format: date
@@ -253,7 +268,8 @@ components:
           format: date
         WOSTATUS:
           type: string
-          enum: [P, A, C]
+          enum: [Planned, In Progress, Completed, On Hold]
+          description: Work order status
         PRIORITY:
           type: integer
 
