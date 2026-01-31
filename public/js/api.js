@@ -8,7 +8,7 @@
 
   const config = {
     BASE_URL: '',
-    API_KEY: 'test-key'
+    API_KEY: 'priority-adk-workshop-2026'
   };
 
   /**
