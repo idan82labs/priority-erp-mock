@@ -62,13 +62,13 @@ pip install google-adk
 
 כתבו בצ'אט של Anti-Gravity:
 
-> צור קובץ .env עם ההגדרות הבאות:
+> Create a .env file with these settings:
 > ```
-> GOOGLE_API_KEY=המפתח_שלי_מגוגל
+> GOOGLE_API_KEY=MY_API_KEY_HERE
 > GOOGLE_GENAI_USE_VERTEXAI=FALSE
 > ```
 
-**החליפו** את `המפתח_שלי_מגוגל` במפתח שקיבלתם מ-Google AI Studio!
+**החליפו** את `MY_API_KEY_HERE` במפתח שקיבלתם מ-Google AI Studio!
 
 ---
 
@@ -78,31 +78,31 @@ pip install google-adk
 
 ### פרומפט 2 - כלי לקריאת לקוחות
 
-> צור קובץ tools.py עם פונקציה שמתחברת ל-API של מערכת ERP.
+> Create a tools.py file with a function that connects to an ERP API.
 >
-> פרטי ההתחברות:
+> Connection details:
 > - URL: https://priority-erp-mock.fly.dev/api
-> - API Key: priority-adk-workshop-2026 (בהדר X-API-Key)
+> - API Key: priority-adk-workshop-2026 (in header X-API-Key)
 >
-> הפונקציה הראשונה: get_customers - מחזירה רשימת לקוחות מהנתיב /CUSTOMERS
+> First function: get_customers - returns list of customers from /CUSTOMERS endpoint
 
 ---
 
 ### פרומפט 3 - הוספת עוד כלים
 
-> תוסיף לקובץ tools.py את הפונקציות הבאות:
+> Add these functions to tools.py:
 >
-> קריאה:
-> 1. get_open_orders - מחזיר הזמנות פתוחות מ-/ORDERS עם פילטר ORDSTATUS eq 'Open'
-> 2. get_overdue_invoices - מחזיר חשבוניות באיחור מ-/AINVOICES עם פילטר IVSTATUS eq 'Overdue'
-> 3. get_low_stock_products - מחזיר מוצרים עם מלאי נמוך מ-/LOGPART
+> Read operations:
+> 1. get_open_orders - returns open orders from /ORDERS with filter ORDSTATUS eq 'Open'
+> 2. get_overdue_invoices - returns overdue invoices from /AINVOICES with filter IVSTATUS eq 'Overdue'
+> 3. get_low_stock_products - returns products with low inventory from /LOGPART
 >
-> יצירה ועדכון:
-> 4. create_customer - יוצר לקוח חדש בנתיב /CUSTOMERS עם POST
-> 5. update_customer - מעדכן לקוח קיים עם PATCH (טלפון, אימייל, סטטוס)
-> 6. update_order_status - מעדכן סטטוס הזמנה עם PATCH
+> Create and update operations:
+> 4. create_customer - creates new customer at /CUSTOMERS with POST
+> 5. update_customer - updates existing customer with PATCH (phone, email, status)
+> 6. update_order_status - updates order status with PATCH
 >
-> **טיפ:** לפרמטרים אופציונליים השתמשו ב-`Optional[str]` מ-typing
+> Use `Optional[str]` from typing for optional parameters
 
 ---
 
@@ -110,12 +110,12 @@ pip install google-adk
 
 זה הכלי שמאפשר לסוכן ללמוד לבד:
 
-> תוסיף פונקציה get_api_documentation שמחזירה את תיעוד ה-API.
+> Add a function get_api_documentation that returns the API documentation.
 >
-> היא צריכה לקרוא את הקובץ מהכתובת:
+> It should fetch the OpenAPI spec from:
 > https://priority-erp-mock.fly.dev/openapi.yaml
 >
-> ככה הסוכן יוכל לקרוא את התיעוד וללמוד לבד איך לעבוד עם ה-API
+> This allows the agent to read the docs and learn how to use the API
 
 ---
 
@@ -123,24 +123,24 @@ pip install google-adk
 
 ### פרומפט 5 - קובץ אתחול (חשוב!)
 
-> צור קובץ __init__.py ריק בתיקיית הפרויקט
+> Create an empty __init__.py file in the project folder
 
 זה קובץ טכני ש-ADK צריך כדי לזהות את הפרויקט כסוכן.
 
 ### פרומפט 6 - הגדרת הסוכן
 
-> צור קובץ agent.py עם סוכן ADK.
+> Create agent.py with an ADK agent.
 >
-> השתמש ב-LlmAgent מ-google.adk.agents עם:
+> Use LlmAgent from google.adk.agents with:
 > - model: gemini-3-flash-preview
 > - name: erp_assistant
-> - הכלים מ-tools.py (שים לב: ייבוא יחסי עם נקודה - `from .tools import ...`)
+> - tools from tools.py (use relative import: `from .tools import ...`)
 >
-> ההוראות לסוכן (instruction):
-> - אתה עוזר למערכת ERP תעשייתית
-> - ענה תמיד בעברית
-> - עזור עם לקוחות, הזמנות, מלאי וחשבוניות
-> - התרע על בעיות כמו חובות ומלאי נמוך
+> Agent instructions (in Hebrew):
+> - You are a helper for an industrial ERP system
+> - Always respond in Hebrew
+> - Help with customers, orders, inventory and invoices
+> - Alert about problems like debts and low stock
 
 ---
 
@@ -148,7 +148,7 @@ pip install google-adk
 
 ### פרומפט 7 - הרצה
 
-> איך מריצים את הסוכן?
+> How do I run the agent?
 
 **פקודות הרצה:**
 
@@ -188,35 +188,35 @@ pip install google-adk
 
 ### פרומפט 8 - יצירת פרויקט React
 
-> צור תיקיית frontend עם פרויקט React (Vite).
+> Create a frontend folder with a React project using Vite.
 >
-> הפרויקט צריך:
-> - package.json עם react, react-dom ו-vite
-> - vite.config.js עם proxy ל-localhost:8000 (שרת ADK)
-> - index.html עם תמיכה בעברית (RTL)
+> The project needs:
+> - package.json with react, react-dom and vite
+> - vite.config.js with proxy to localhost:8000 (ADK server)
+> - index.html with Hebrew support (RTL, lang="he")
 
 ### פרומפט 9 - קומפוננטת צ'אט
 
-> צור קומפוננטת App.jsx עם ממשק צ'אט לסוכן ADK.
+> Create App.jsx with a chat interface for the ADK agent.
 >
-> הממשק צריך:
-> - יצירת session ב-/apps/erp-assistant/users/{user}/sessions
-> - שליחת הודעות ב-POST ל-/run_sse עם SSE streaming
-> - הצגת הודעות משתמש וסוכן בסגנון צ'אט
-> - אינדיקציה כשהסוכן חושב (typing indicator)
-> - כפתור "שיחה חדשה"
-> - תמיכה בעברית
+> The interface needs:
+> - Create session at /apps/erp-assistant/users/{user}/sessions
+> - Send messages via POST to /run_sse with SSE streaming
+> - Display user and agent messages in chat style
+> - Typing indicator when agent is thinking
+> - "New chat" button
+> - Hebrew UI (RTL) - title "עוזר ERP חכם", button "שלח", placeholder "הקלד הודעה..."
 
 ### פרומפט 10 - עיצוב CSS
 
-> צור קובץ styles.css עם עיצוב מודרני לצ'אט.
+> Create styles.css with modern chat styling.
 >
-> העיצוב צריך:
-> - רקע gradient יפה
-> - בועות הודעות עגולות
-> - הודעות משתמש בצד ימין, סוכן בצד שמאל
-> - אנימציית typing כשהסוכן חושב
-> - תמיכה ב-RTL
+> The design needs:
+> - Beautiful gradient background
+> - Rounded message bubbles
+> - User messages on right, agent on left
+> - Typing animation when agent thinks
+> - RTL support for Hebrew
 
 ### הרצה
 
@@ -234,11 +234,11 @@ npm run dev
 
 אם יש בעיות עם יצירת הממשק, השתמשו בפרומפט הזה:
 
-> הורד את ממשק ה-React המוכן מהכתובת:
+> Download the ready-made React frontend from:
 > https://github.com/idan82labs/priority-erp-mock/tree/main/adk-frontend
 >
-> שים את הקבצים בתיקיית frontend בפרויקט שלי.
-> אחרי זה תריץ npm install ו-npm run dev.
+> Put the files in a frontend folder in my project.
+> Then run npm install and npm run dev.
 
 הממשק המוכן זהה לזה שבניתם - פשוט עובד מהקופסה!
 
@@ -296,21 +296,21 @@ npm run dev
 
 ### "שגיאת API Key" או "Unauthorized"
 
-> יש לי שגיאת API Key. תבדוק שקובץ .env קיים עם GOOGLE_API_KEY
+> I have an API Key error. Check that .env file exists with GOOGLE_API_KEY
 
 ודאו שהמפתח מ-Google AI Studio מועתק נכון בקובץ `.env`
 
 ### הסוכן לא מתחבר ל-ERP
 
-> הסוכן לא מצליח להתחבר ל-API של ה-ERP. תבדוק את הקוד ב-tools.py
+> The agent can't connect to the ERP API. Check the code in tools.py
 
 ### הסוכן לא עונה בעברית
 
-> תעדכן את ההוראות לסוכן (instruction) שיענה תמיד בעברית
+> Update the agent instructions to always respond in Hebrew
 
 ### רוצה להוסיף יכולת חדשה
 
-> תוסיף לסוכן יכולת לעדכן סטטוס של הזמנה דרך PATCH ל-/ORDERS
+> Add a tool to update order status via PATCH to /ORDERS
 
 ---
 
