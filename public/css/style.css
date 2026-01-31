@@ -2815,6 +2815,248 @@ textarea.form-control {
   }
 }
 
+/* ============================================
+   API Activity Log Panel
+   ============================================ */
+
+.activity-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100vh;
+  background: var(--white);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s ease;
+}
+
+.activity-panel.open {
+  right: 0;
+}
+
+.activity-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--primary-dark);
+  color: var(--white);
+}
+
+.activity-panel-header h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.activity-panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activity-panel-controls .btn-ghost {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 4px 8px;
+}
+
+.activity-panel-controls .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--white);
+}
+
+.activity-panel-close {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.auto-refresh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+.auto-refresh-toggle input {
+  cursor: pointer;
+}
+
+.activity-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  background: var(--gray-100);
+}
+
+.activity-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--white);
+  border-top: 1px solid var(--gray-200);
+  font-size: 0.75rem;
+  color: var(--gray-600);
+}
+
+.activity-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 2px 8px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  font-size: 0.78rem;
+  border-left: 3px solid var(--gray-300);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.activity-item.new {
+  background: #e8f8f0;
+  border-left-color: var(--success);
+}
+
+.activity-item:hover {
+  background: var(--gray-100);
+}
+
+.activity-time {
+  color: var(--gray-500);
+  font-size: 0.72rem;
+  min-width: 60px;
+}
+
+.activity-method {
+  font-weight: 700;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.activity-method.method-get {
+  background: #d6eaf8;
+  color: #1a5276;
+}
+
+.activity-method.method-post {
+  background: #d5f5e3;
+  color: #1e8449;
+}
+
+.activity-method.method-patch,
+.activity-method.method-put {
+  background: #fdebd0;
+  color: #a04000;
+}
+
+.activity-method.method-delete {
+  background: #fadbd8;
+  color: #922b21;
+}
+
+.activity-path {
+  flex: 1;
+  color: var(--gray-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.72rem;
+}
+
+.activity-status {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+}
+
+.activity-status.status-success {
+  background: #d5f5e3;
+  color: #1e8449;
+}
+
+.activity-status.status-client-error {
+  background: #fdebd0;
+  color: #a04000;
+}
+
+.activity-status.status-server-error {
+  background: #fadbd8;
+  color: #922b21;
+}
+
+.activity-duration {
+  color: var(--gray-500);
+  font-size: 0.68rem;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Activity toggle button */
+#activity-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.activity-icon {
+  font-size: 1rem;
+}
+
+.activity-badge {
+  background: var(--danger);
+  color: var(--white);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.activity-badge:empty,
+.activity-badge[data-count="0"] {
+  display: none;
+}
+
+/* RTL support for activity panel */
+[dir="rtl"] .activity-panel {
+  right: auto;
+  left: -400px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+[dir="rtl"] .activity-panel.open {
+  left: 0;
+  right: auto;
+}
+
+[dir="rtl"] .activity-item {
+  border-left: none;
+  border-right: 3px solid var(--gray-300);
+}
+
+[dir="rtl"] .activity-item.new {
+  border-right-color: var(--success);
+}
+
 /* --- Print Styles --- */
 @media print {
   .sidebar,

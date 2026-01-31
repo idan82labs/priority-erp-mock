@@ -11,9 +11,91 @@ const authMiddleware = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ─── Activity Log (in-memory) ────────────────────────────────────────────────
+const activityLog = [];
+const MAX_ACTIVITY_LOG = 100;
+
+function logActivity(req, res, startTime) {
+  const duration = Date.now() - startTime;
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    path: req.originalUrl || req.url,
+    status: res.statusCode,
+    duration,
+    ip: req.ip || req.connection?.remoteAddress || 'unknown',
+    userAgent: req.get('User-Agent')?.substring(0, 50) || 'unknown'
+  };
+
+  activityLog.unshift(entry);
+  if (activityLog.length > MAX_ACTIVITY_LOG) {
+    activityLog.pop();
+  }
+}
+
+// ─── Simple Rate Limiter (in-memory) ─────────────────────────────────────────
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 100; // requests per window
+
+function rateLimiter(req, res, next) {
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return next();
+  }
+
+  const record = rateLimitMap.get(ip);
+
+  if (now - record.windowStart > RATE_LIMIT_WINDOW) {
+    // Reset window
+    record.count = 1;
+    record.windowStart = now;
+    return next();
+  }
+
+  record.count++;
+
+  if (record.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({
+      error: 'Too Many Requests',
+      message: `Rate limit exceeded. Max ${RATE_LIMIT_MAX} requests per minute.`,
+      retryAfter: Math.ceil((record.windowStart + RATE_LIMIT_WINDOW - now) / 1000)
+    });
+  }
+
+  next();
+}
+
+// Clean up rate limit map periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now - record.windowStart > RATE_LIMIT_WINDOW * 2) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 60000);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(rateLimiter);
+
+// Activity logging middleware (for API routes)
+app.use('/api', (req, res, next) => {
+  const startTime = Date.now();
+  res.on('finish', () => {
+    // Don't log activity endpoint itself to avoid recursion
+    if (!req.originalUrl?.includes('/api/activity')) {
+      logActivity(req, res, startTime);
+    }
+  });
+  next();
+});
 
 // Serve static front-end
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -46,6 +128,27 @@ app.get('/api/health', (req, res) => {
       'CUSTOMERS', 'ORDERS', 'LOGPART', 'AINVOICES', 'SUPPLIERS',
       'WORKORDERS', 'BOM', 'PRODUCTIONPLANS', 'EMPLOYEES', 'TIMESHEETS', 'DEPARTMENTS'
     ]
+  });
+});
+
+// Activity log endpoint (for workshop instructor view)
+app.get('/api/activity', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 50, MAX_ACTIVITY_LOG);
+  const since = req.query.since; // ISO timestamp to get only newer entries
+
+  let entries = activityLog;
+  if (since) {
+    entries = activityLog.filter(e => e.timestamp > since);
+  }
+
+  res.json({
+    count: entries.slice(0, limit).length,
+    total: activityLog.length,
+    rateLimit: {
+      windowMs: RATE_LIMIT_WINDOW,
+      max: RATE_LIMIT_MAX
+    },
+    entries: entries.slice(0, limit)
   });
 });
 
